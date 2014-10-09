@@ -1,0 +1,128 @@
+<html>
+<meta charset="utf-8">
+<style>
+
+body {
+  text-align: center;
+  padding: 20px;
+}
+
+canvas {
+  box-shadow: 0px 10px 20px;
+}
+
+#word-holder {
+  text-transform: uppercase;
+}
+
+</style>
+<h1 id="word-holder"></h1>
+<p>
+  <canvas width="500" height="500"></canvas>
+</p>
+<p>
+  <button onclick="download();">Download pictures.py</button>
+</p>
+<script src="FileSaver.js"></script>
+<script src="nounlist.js"></script>
+<script>
+
+var word = 0;
+var wordHolder = document.getElementById('word-holder');
+wordHolder.innerHTML = words[word];
+var logs = [];
+var log = [];
+var logStart, strip;
+
+var canvas = document.getElementsByTagName('canvas')[0];
+var bb = canvas.getBoundingClientRect();
+var ctx = canvas.getContext('2d');
+var ox, oy, oox, ooy;
+
+canvas.addEventListener('mousedown', function(e) {
+  var x = Math.floor(e.clientX - bb.left), y = Math.floor(e.clientY - bb.top);
+  oox = ox = x;
+  ooy = oy = y;
+  if (!logStart) {
+    logStart = Date.now();
+  }
+  strip = [];
+  strip.push([Date.now() - logStart, x, y, Math.floor(1000 * e.mozPressure)]);
+});
+
+canvas.addEventListener('mouseup', function(e) {
+  log.push(strip);
+});
+
+canvas.addEventListener('mousemove', function(e) {
+  var x = Math.floor(e.clientX - bb.left), y = Math.floor(e.clientY - bb.top);
+  if (e.buttons) {
+    ctx.lineWidth = e.mozPressure * 10;
+    ctx.beginPath();
+    ctx.moveTo(oox, ooy);
+    ctx.lineTo(ox, oy);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    strip.push([Date.now() - logStart, x, y, Math.floor(1000 * e.mozPressure)]);
+  }
+  oox = ox; ooy = oy;
+  ox = x; oy = y;
+});
+
+function clear() {
+  ctx.clearRect(0, 0, bb.width, bb.height);
+  log = [];
+  logStart = undefined;
+}
+
+function nextWord() {
+  logs[word] = log;
+  word += 1;
+  wordHolder.innerHTML = words[word];
+  clear();
+}
+
+function prevWord() {
+  logs[word] = log;
+  word -= 1;
+  wordHolder.innerHTML = words[word];
+  clear();
+}
+
+function download() {
+  logs[word] = log;
+  var dict = '';
+  dict += 'import collections\n';
+  dict += "P = collections.namedtuple('P', 'time x y pressure')\n";
+  dict += '# time is in milliseconds, pressure goes from 0 to 1000.\n';
+  dict += 'words = {\n';
+  for (var i = 0; i < words.length; ++i) {
+    if (logs[i] && logs[i].length) {
+      dict += "  '" + words[i] + "': [\n";
+      for (var j = 0; j < logs[i].length; ++j) {
+        var strip = logs[i][j];
+        dict += '    [';
+        for (var k = 0; k < strip.length; ++k) {
+          dict += 'P(' + strip[k] + '), ';
+        }
+        dict += '],\n';
+      }
+      dict += '  ],\n';
+    }
+  }
+  dict += '}\n';
+  saveAs(new Blob([dict]), 'pictures.py');
+}
+
+window.addEventListener('keyup', function(e) {
+  if (e.keyCode === KeyEvent.DOM_VK_N) {
+    nextWord();
+  } else if (e.keyCode === KeyEvent.DOM_VK_P) {
+    prevWord();
+  } else if (e.keyCode === KeyEvent.DOM_VK_R) {
+    clear();
+  }
+});
+
+</script>
+</html>
