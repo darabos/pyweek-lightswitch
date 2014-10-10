@@ -15,7 +15,15 @@ canvas {
   text-transform: uppercase;
 }
 
+#search-frame {
+  float: right;
+  width: 400px;
+  height: 100%;
+  border: 0;
+}
+
 </style>
+<iframe id="search-frame"></iframe>
 <h1 id="word-holder"></h1>
 <p>
   <canvas width="500" height="500"></canvas>
@@ -29,7 +37,7 @@ canvas {
 
 var word = 0;
 var wordHolder = document.getElementById('word-holder');
-wordHolder.innerHTML = words[word];
+var searchFrame = document.getElementById('search-frame');
 var logs = [];
 var log = [];
 var logStart, strip;
@@ -75,18 +83,22 @@ function clear() {
   logStart = undefined;
 }
 
+function updateWord() {
+  wordHolder.innerHTML = words[word];
+  searchFrame.src = 'http://en.m.wikipedia.org/wiki/' + words[word];
+  clear();
+}
+
 function nextWord() {
   logs[word] = log;
   word += 1;
-  wordHolder.innerHTML = words[word];
-  clear();
+  updateWord();
 }
 
 function prevWord() {
   logs[word] = log;
   word -= 1;
-  wordHolder.innerHTML = words[word];
-  clear();
+  updateWord();
 }
 
 function download() {
@@ -123,6 +135,8 @@ window.addEventListener('keyup', function(e) {
     clear();
   }
 });
+
+updateWord();
 
 </script>
 </html>
