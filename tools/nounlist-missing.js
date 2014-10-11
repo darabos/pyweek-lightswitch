@@ -8,4 +8,6 @@ var words = [
   'axe',
   'dagger',
   'armor',
+  'spaceship',
+  'dome',
   ];
