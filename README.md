@@ -40,7 +40,9 @@ to win. The room is then revealed.
 Note that repeating the same item 5 times will not work.
 
 Hints are printed in the terminal. You can choose your difficulty by hiding
-or revealing the terminal while playing.
+or revealing the terminal while playing. For extra easy difficulty you can
+start using gobbledygook, nonsense words, or just hammering the keyboard like
+you always wanted.
 
 
 
