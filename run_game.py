@@ -5,6 +5,7 @@ import os
 import picture_render
 import pygame
 import random
+import string
 import sys
 from OpenGL.GL import *
 
@@ -102,10 +103,24 @@ class Font(object):
     self.cache = {}
 
 
+class ContainsRule(object):
+
+  def __init__(self, letter):
+    self.letter = letter
+
+  def accepts(self, word):
+    return self.letter in word
+
+
+def RandomRule():
+  return ContainsRule(random.choice(string.lowercase))
+
+
 class Game(object):
 
   def __init__(self):
     self.word = ''
+    self.rule = RandomRule()
 
   def Loop(self):
     pygame.init()
@@ -130,12 +145,18 @@ class Game(object):
       for e in pygame.event.get():
         if e.type == pygame.KEYDOWN:
           if ord('a') <= e.key <= ord('z'):
-            self.word += chr(e.key).upper()
+            self.word += chr(e.key)
           elif e.key == pygame.K_BACKSPACE:
             self.word = self.word[:-1]
           elif e.key == pygame.K_RETURN:
-            p = picture_render.WordPictureForWord(self.word.lower())
+            p = picture_render.WordPictureForWord(self.word)
             p.start = self.time
+            if self.rule.accepts(self.word):
+              p.primary = 0.3, 2, 0.3, 1
+              p.secondary = 1, 1, 1, 1
+            else:
+              p.primary = 2, 0.3, 0.3, 1
+              p.secondary = 1, 1, 1, 1
             self.pictures.append(p)
             self.word = ''
         if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -152,14 +173,14 @@ class Game(object):
             s = 1.0 + t * 0.1
             glScale(s, s, 1.0)
             glTranslate(-0.5, -0.5, 0)
-            p.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
+            p.RenderSetup(p.primary, p.secondary)
             if t < 2:
               p.Render(t)
             elif t < 3:
               p.Render(3 - t)
             else:
               self.pictures.remove(p)
-      self.font.Render(0, -200, self.word)
+      self.font.Render(0, -200, self.word.upper())
       pygame.display.flip()
 
 
