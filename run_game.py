@@ -127,7 +127,7 @@ class Game(object):
     self.words = []
     self.successes = 0
     self.victory = False
-    self.victory_pictures = []
+    self.victory_pictures = {}
 
   def Loop(self):
     pygame.init()
@@ -188,7 +188,7 @@ class Game(object):
               self.pictures.remove(p)
 
         if self.victory:
-          for p in self.victory_pictures:
+          for p in self.victory_pictures.values():
             with Transform():
               glTranslate(-0.5 + p.x, -0.5 + p.y, 0)
               glScale(p.scale, p.scale, 1.0)
@@ -212,8 +212,9 @@ class Game(object):
       if self.rule.accepts(self.word):
         p.primary = 0.3, 2, 0.3, 1
         p.secondary = 1, 1, 1, 1
-        self.successes += 1
-        self.victory_pictures.append(p)
+        if self.word not in self.victory_pictures:
+          self.successes += 1
+          self.victory_pictures[self.word] = p
       else:
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
@@ -222,7 +223,7 @@ class Game(object):
 
       if self.successes == 5:
         self.victory = True
-        for p in self.victory_pictures:
+        for p in self.victory_pictures.values():
           p.scale = random.uniform(0.3, 0.5)
           p.x = random.uniform(-0.8, 0.8)
           p.y = random.uniform(-0.5, 0.5)
