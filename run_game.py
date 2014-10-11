@@ -2,6 +2,7 @@ import ctypes
 import contextlib
 import math
 import os
+import picture_render
 import pygame
 import random
 import sys
@@ -85,6 +86,7 @@ class Font(object):
         self.DropCache()
       self.cache[text] = width, height, tex
     width, height, tex = self.cache[text]
+    glUseProgram(0)
     with Transform():
       glTranslate(x, y, 0)
       with Texture(tex):
@@ -118,9 +120,13 @@ class Game(object):
     clock = pygame.time.Clock()
     pygame.font.init()
     self.font = Font(40)
+    picture_render.Shaders.Setup()
+    self.time = 0
+    self.pictures = []
 
     while True:
-      clock.tick(60)
+      dt = clock.tick(60)
+      self.time += dt / 1000.0
       for e in pygame.event.get():
         if e.type == pygame.KEYDOWN:
           if ord('a') <= e.key <= ord('z'):
@@ -128,13 +134,21 @@ class Game(object):
           elif e.key == pygame.K_BACKSPACE:
             self.word = self.word[:-1]
           elif e.key == pygame.K_RETURN:
-            print self.word
+            p = picture_render.WordPictureForWord(self.word.lower())
+            p.start = self.time
+            self.pictures.append(p)
             self.word = ''
         if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
           pygame.quit()
           sys.exit(0)
       glClear(GL_COLOR_BUFFER_BIT)
       glLoadIdentity()
+      with Transform():
+        glScale(300, 300, 1.0)
+        glTranslate(-0.5, -0.2, 0)
+        for p in self.pictures:
+          p.RenderSetup()
+          p.Render(self.time - p.start)
       self.font.Render(0, -200, self.word)
       pygame.display.flip()
 

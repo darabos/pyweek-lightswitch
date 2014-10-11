@@ -225,5 +225,5 @@ def main_hack():
     word.Render(t, t - 4.0)
     pygame.display.flip()
 
-
-main_hack()
+if __name__ == '__main__':
+  main_hack()
