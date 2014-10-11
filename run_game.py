@@ -213,12 +213,12 @@ class Game(object):
         p.primary = 0.3, 2, 0.3, 1
         p.secondary = 1, 1, 1, 1
         self.successes += 1
+        self.victory_pictures.append(p)
       else:
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
         self.successes = 0
       self.pictures.append(p)
-      self.victory_pictures.append(p)
 
       if self.successes == 5:
         self.victory = True
