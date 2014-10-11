@@ -11,4 +11,6 @@ var words = [
   'spaceship',
   'dome',
   'pirate',
+  'alexander',
+  'andras',
   ];
