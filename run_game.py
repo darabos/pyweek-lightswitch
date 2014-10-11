@@ -120,7 +120,12 @@ class Game(object):
 
   def __init__(self):
     self.word = ''
+    self.reset()
+
+  def reset(self):
     self.rule = RandomRule()
+    self.words = []
+    self.successes = 0
 
   def Loop(self):
     pygame.init()
@@ -130,7 +135,7 @@ class Game(object):
     pygame.display.set_mode((WIDTH, HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE)
     glViewport(0, 0, WIDTH, HEIGHT)
     glMatrixMode(GL_PROJECTION)
-    glScale(2.0/WIDTH, 2.0/HEIGHT, 1.0)
+    glScale(2.0 / WIDTH, 2.0 / HEIGHT, 1.0)
     glMatrixMode(GL_MODELVIEW)
     clock = pygame.time.Clock()
     pygame.font.init()
@@ -154,10 +159,23 @@ class Game(object):
             if self.rule.accepts(self.word):
               p.primary = 0.3, 2, 0.3, 1
               p.secondary = 1, 1, 1, 1
+              self.successes += 1
             else:
               p.primary = 2, 0.3, 0.3, 1
               p.secondary = 1, 1, 1, 1
+              self.successes = 0
             self.pictures.append(p)
+
+            if self.successes == 5:
+              for w in self.words:
+                p = picture_render.WordPictureForWord(self.word)
+                p.start = self.time
+                p.primary = 1, 1, 1, 1
+                p.secondary = 1, 1, 1, 1
+                self.pictures.append(p)
+              self.reset()
+
+            self.words.append(self.word)
             self.word = ''
         if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
           pygame.quit()
