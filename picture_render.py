@@ -103,12 +103,20 @@ class WordPicture(object):
     print ('x: %g - %g, y: %g - %g, max_t: %g, t_adjust: %g'
            % (min_x, max_x, min_y, max_y, max_t, t_adjust))
 
-    x_scale = 0.90 / float(max_x - min_x)
-    y_scale = 0.90 / float(max_y - min_y)
+    x_scale = 1 / float(max_x - min_x)
+    y_scale = 1 / float(max_y - min_y)
+    scale = scale = min(x_scale, y_scale)
+    print x_scale, y_scale
+    if x_scale > y_scale:
+      x_offs = (1 - y_scale / x_scale) / 2.
+      y_offs = 0
+    else:
+      x_offs = 0
+      y_offs = (1 - x_scale / y_scale) / 2.
     t_scale = 1 / float(max_t)
     for v in vertices:
-      v[0] = 0.05 + (v[0] - min_x) * x_scale
-      v[1] = 0.95 - (v[1] - min_y) * y_scale
+      v[0] = 0.05 + 0.9 * ((v[0] - min_x) * scale + x_offs)
+      v[1] = 0.95 - 0.9 * ((v[1] - min_y) * scale + y_offs)
       v[2] = v[2] * t_scale
 
     self.n = len(vertices)
@@ -187,8 +195,8 @@ def main_hack():
   Shaders.Setup()
 
   print pictures_light.words.keys()
-  #w = random.sample(pictures_light.words.keys(), 1)[0]
-  w = 'account'
+  w = random.sample(pictures_light.words.keys(), 1)[0]
+  #w = 'accountant'
   word = WordPictureForWord(w)
   print w
 
@@ -196,7 +204,7 @@ def main_hack():
   t = 0
   while True:
     dt = clock.tick()
-    print clock
+    #print clock
     for e in pygame.event.get():
       if e.type == pygame.QUIT:
         return
