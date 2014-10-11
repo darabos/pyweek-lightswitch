@@ -19,4 +19,5 @@ var words = [
   'mage',
   'wizard',
   'barbarian',
+  'guy',
   ];
