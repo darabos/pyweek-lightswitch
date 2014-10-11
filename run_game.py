@@ -11,6 +11,13 @@ from OpenGL.GL import *
 
 WIDTH, HEIGHT = 800, 600
 
+SOUNDS = {
+  'accepted': 'sounds/cor.ogg',
+  'rejected': 'sounds/wrong.ogg',
+}
+
+MUSIC = ['sounds/lightswitch.ogg']
+
 
 def Quad(width, height):
   glBegin(GL_TRIANGLE_STRIP)
@@ -214,10 +221,18 @@ class Game(object):
     self.pictures = []
     self.background = 0
     self.wpl = picture_render.WordPictureLoader()
+    for k, v in SOUNDS.items():
+      SOUNDS[k] = pygame.mixer.Sound(v)
 
     while True:
       dt = clock.tick(60)
       self.time += dt / 1000.0
+      if not pygame.mixer.music.get_busy():
+        m = MUSIC.pop()
+        pygame.mixer.music.load(m)
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play()
+        MUSIC.insert(0, m)
       for e in pygame.event.get():
         if e.type == pygame.KEYDOWN:
           self.HandleKey(e.key)
@@ -278,12 +293,14 @@ class Game(object):
       p = self.wpl.WordPictureForWord(self.word)
       p.start = self.time
       if self.rule.accepts(self.word):
+        SOUNDS['accepted'].play()
         p.primary = 0.3, 2, 0.3, 1
         p.secondary = 1, 1, 1, 1
         if self.word not in self.victory_pictures:
           self.successes += 1
           self.victory_pictures[self.word] = p
       else:
+        SOUNDS['rejected'].play()
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
         self.successes = 0
