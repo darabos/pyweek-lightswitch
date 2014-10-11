@@ -108,6 +108,8 @@ class ContainsRule(object):
     self.letter = letter
   def accepts(self, word):
     return self.letter in word
+  def hint(self):
+    return 'Hint: Guess my favorite letter!'
 
 
 class EndsWithRule(object):
@@ -115,6 +117,8 @@ class EndsWithRule(object):
     self.letters = letters
   def accepts(self, word):
     return word[-1] in self.letters
+  def hint(self):
+    return 'Hint: The word ends with you!'
 
 
 class StartsWithRule(object):
@@ -122,6 +126,8 @@ class StartsWithRule(object):
     self.letters = letters
   def accepts(self, word):
     return word[0] in self.letters
+  def hint(self):
+    return 'Hint: It all starts with the word itself...'
 
 
 class LengthRule(object):
@@ -129,6 +135,8 @@ class LengthRule(object):
     self.length = length
   def accepts(self, word):
     return len(word) == self.length
+  def hint(self):
+    return 'Hint: Not too long, not too short...'
 
 
 class MusicalRule(object):
@@ -137,6 +145,8 @@ class MusicalRule(object):
       if x in word:
         return True
     return False
+  def hint(self):
+    return 'Hint: You hear sounds of music from the room...'
 
 
 class DoubleLetterRule(object):
@@ -147,6 +157,8 @@ class DoubleLetterRule(object):
         return True
       last = c
     return False
+  def hint(self):
+    return 'Hint: Double, Double, Toil and Trouble...'
 
 
 letters = string.lowercase.replace('x', '')
@@ -166,7 +178,9 @@ def RandomRule():
     for i in range(2):
       next_rules.append(LengthRule(random.randint(3, 6)))
     random.shuffle(next_rules)
-  return next_rules.pop()
+  rule = next_rules.pop()
+  print rule.hint()
+  return rule
 
 
 class Game(object):
