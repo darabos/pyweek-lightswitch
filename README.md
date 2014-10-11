@@ -37,6 +37,8 @@ accepted. There is a rule for what words are accepted. The rule is picked at
 random. You have to figure out the rule and submit 5 accepted items in a row
 to win. The room is then revealed.
 
+(Note that repeating the same item 5 times will not work.)
+
 
 
 LICENSE

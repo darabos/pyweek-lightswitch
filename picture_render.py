@@ -1,7 +1,6 @@
 import ctypes
+import zipfile
 from OpenGL.GL import *
-
-import pictures_light
 
 
 def CompileShader(src, kind, kind_name, name):
@@ -86,52 +85,9 @@ void main() {
                                                     b'unrender_time')
 
 class WordPicture(object):
-  def __init__(self, data):
-    self.data = data
-
-    min_x = max_x = data[0][0].x
-    min_y = max_y = data[0][0].y
-    t_adjust = 0
-    last_t = 0
-    vertices = []
-    for stroke in data:
-      if not stroke:
-        continue
-      t_adjust += stroke[0].time - last_t
-      vertices.append([stroke[0].x, stroke[0].y, stroke[0].time - t_adjust, 0])
-      for time, x, y, pressure in stroke:
-        min_x = min(min_x, x)
-        max_x = max(max_x, x)
-        min_y = min(min_y, y)
-        max_y = max(max_y, y)
-        vertices.append([x, y, time - t_adjust, min(1, pressure / 500.)])
-      vertices.append([x, y, time - t_adjust, 0])
-      last_t = time
-    max_t = vertices[-1][2]
-
-    x_scale = 1 / float(max_x - min_x)
-    y_scale = 1 / float(max_y - min_y)
-    scale = scale = min(x_scale, y_scale)
-    if x_scale > y_scale:
-      x_offs = (1 - y_scale / x_scale) / 2.
-      y_offs = 0
-    else:
-      x_offs = 0
-      y_offs = (1 - x_scale / y_scale) / 2.
-    t_scale = 1 / float(max_t)
-    for v in vertices:
-      v[0] = 0.05 + 0.9 * ((v[0] - min_x) * scale + x_offs)
-      v[1] = 0.95 - 0.9 * ((v[1] - min_y) * scale + y_offs)
-      v[2] = v[2] * t_scale
-
-    self.n = len(vertices)
-    self.v_array = (ctypes.c_float * (self.n * 4))()
-    for i, v in enumerate(vertices):
-      self.v_array[i * 4 + 0] = v[0]
-      self.v_array[i * 4 + 1] = v[1]
-      self.v_array[i * 4 + 2] = v[2]
-      self.v_array[i * 4 + 3] = v[3]
-
+  def __init__(self, vbuf):
+    self.v_array = vbuf
+    self.n = len(vbuf) / 16
 
   # Sets up misc. render state for drawing word pictures. Can be
   # called once followed by many Render calls.
@@ -139,7 +95,7 @@ class WordPicture(object):
   def RenderSetup(cls, main_color, tip_color):
     glEnable(GL_LINE_SMOOTH)
     glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glLineWidth(4)
 
     prg = Shaders.line_drawing_program
@@ -166,13 +122,16 @@ class WordPicture(object):
     glDisableClientState(GL_VERTEX_ARRAY)
 
 
-def WordPictureForWord(word):
-  data = pictures_light.words.get(word)
-  if data is None:
-    fallback = random.choice(pictures_light.words.keys())
-    data = pictures_light.words[fallback]
+class WordPictureLoader(object):
+  def __init__(self):
+    self.source = zipfile.ZipFile('pictures_vbuf.zip', 'r')
+    self.all_words = self.source.namelist()
 
-  return WordPicture(data)
+  def WordPictureForWord(self, word):
+    if word not in self.all_words:
+      word = random.choice(self.all_words)
+    raw_data = self.source.read(word)
+    return WordPicture(raw_data)
 
 
 
@@ -195,10 +154,10 @@ def main_hack():
 
   Shaders.Setup()
 
-  print pictures_light.words.keys()
-  w = random.sample(pictures_light.words.keys(), 1)[0]
+  wpl = WordPictureLoader()
+  w = random.choice(wpl.all_words)
   #w = 'accountant'
-  word = WordPictureForWord(w)
+  word = wpl.WordPictureForWord(w)
   print w
 
   clock = pygame.time.Clock()
@@ -215,7 +174,7 @@ def main_hack():
     t += dt / 1000.
     GL.glClear(GL.GL_COLOR_BUFFER_BIT)
     word.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
-    word.Render(t, t - 1.2)
+    word.Render(t, t - 5.0)
     pygame.display.flip()
 
 if __name__ == '__main__':
