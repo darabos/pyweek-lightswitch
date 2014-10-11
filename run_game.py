@@ -165,10 +165,11 @@ class Game(object):
             s = 1.0 + t * 0.1
             glScale(s, s, 1.0)
             glTranslate(-0.5, -0.5, 0)
-            p.RenderSetup(p.primary, p.secondary)
             if t < 2:
+              p.RenderSetup(p.primary, p.secondary)
               p.Render(t)
             elif t < 3:
+              p.RenderSetup(p.primary, (0, 0, 0, 0))
               p.Render(3 - t)
             else:
               self.pictures.remove(p)
