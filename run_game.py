@@ -104,16 +104,69 @@ class Font(object):
 
 
 class ContainsRule(object):
-
   def __init__(self, letter):
     self.letter = letter
-
   def accepts(self, word):
     return self.letter in word
 
 
+class EndsWithRule(object):
+  def __init__(self, letters):
+    self.letters = letters
+  def accepts(self, word):
+    return word[-1] in self.letters
+
+
+class StartsWithRule(object):
+  def __init__(self, letters):
+    self.letters = letters
+  def accepts(self, word):
+    return word[0] in self.letters
+
+
+class LengthRule(object):
+  def __init__(self, length):
+    self.length = length
+  def accepts(self, word):
+    return len(word) == self.length
+
+
+class MusicalRule(object):
+  def accepts(self, word):
+    for x in 'do re mi fa sol la ti'.split():
+      if x in word:
+        return True
+    return False
+
+
+class DoubleLetterRule(object):
+  def accepts(self, word):
+    last = None
+    for c in word:
+      if c == last:
+        return True
+      last = c
+    return False
+
+
+letters = string.lowercase.replace('x', '')
+vowels = 'aeiou'
+consonants = [l for l in letters if l not in vowels]
+next_rules = []
 def RandomRule():
-  return ContainsRule(random.choice(string.lowercase))
+  if not next_rules:
+    next_rules.append(MusicalRule())
+    next_rules.append(DoubleLetterRule())
+    next_rules.append(EndsWithRule(consonants))
+    next_rules.append(EndsWithRule(vowels))
+    for i in range(3):
+      next_rules.append(StartsWithRule(random.choice(letters)))
+    for i in range(6):
+      next_rules.append(ContainsRule(random.choice(letters)))
+    for i in range(2):
+      next_rules.append(LengthRule(random.randint(3, 6)))
+    random.shuffle(next_rules)
+  return next_rules.pop()
 
 
 class Game(object):
@@ -207,7 +260,7 @@ class Game(object):
       self.word += chr(key)
     elif key == pygame.K_BACKSPACE:
       self.word = self.word[:-1]
-    elif key == pygame.K_RETURN:
+    elif key == pygame.K_RETURN and self.word:
       p = self.wpl.WordPictureForWord(self.word)
       p.start = self.time
       if self.rule.accepts(self.word):
