@@ -2,7 +2,13 @@ Lightswitch
 ===========
 
 A team entry in PyWeek #19  <http://www.pyweek.org/19/>
-by Alexander Malmberg and Daniel Darabos.
+
+  - Code: Alexander Malmberg and Daniel Darabos
+  - Sounds: Christopher Malmberg
+  - Music: Andras Barjak
+  - Art: Daniel Darabos
+  - Font: Licensed under Apache License, created by Steve Matteson
+    (not a member of the team)
 
 
 
