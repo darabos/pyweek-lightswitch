@@ -50,9 +50,11 @@ varying float time;
 varying float pressure;
 
 uniform float render_time;
+uniform float unrender_time;
 
 uniform float render_pre_time;
 uniform float render_post_time;
+uniform float unrender_pre_time;
 uniform vec4 main_color;
 uniform vec4 tip_color;
 
@@ -66,8 +68,13 @@ void main() {
   } else if (time > render_time - render_post_time) {
     float a = (render_time - time) / render_post_time;
     c = mix(tip_color, vec4(main_color.xyz, pressure), a);
-  } else {
+  } else if (time > unrender_time + unrender_pre_time) {
     c = vec4(main_color.xyz, pressure);
+  } else if (time > unrender_time) {
+    float a = (time - unrender_time) / unrender_pre_time;
+    c = mix(vec4(0, 0, 0, 0), vec4(main_color.xyz, pressure), a);
+  } else {
+    c = vec4(0, 0, 0, 0);
   }
 
   gl_FragColor = c;
@@ -75,6 +82,8 @@ void main() {
 """)
     self.line_drawing_time = glGetUniformLocation(self.line_drawing_program,
                                                   b'render_time')
+    self.line_drawing_untime = glGetUniformLocation(self.line_drawing_program,
+                                                    b'unrender_time')
 
 class WordPicture(object):
   def __init__(self, data):
@@ -100,13 +109,9 @@ class WordPicture(object):
       last_t = time
     max_t = vertices[-1][2]
 
-    print ('x: %g - %g, y: %g - %g, max_t: %g, t_adjust: %g'
-           % (min_x, max_x, min_y, max_y, max_t, t_adjust))
-
     x_scale = 1 / float(max_x - min_x)
     y_scale = 1 / float(max_y - min_y)
     scale = scale = min(x_scale, y_scale)
-    print x_scale, y_scale
     if x_scale > y_scale:
       x_offs = (1 - y_scale / x_scale) / 2.
       y_offs = 0
@@ -143,6 +148,8 @@ class WordPicture(object):
     glUniform1f(l, 0.1)
     l = glGetUniformLocation(prg, b'render_post_time')
     glUniform1f(l, 0.2)
+    l = glGetUniformLocation(prg, b'unrender_pre_time')
+    glUniform1f(l, 0.4)
     l = glGetUniformLocation(prg, b'main_color')
     glUniform4f(l, 1, 1, 1, 1)
     l = glGetUniformLocation(prg, b'tip_color')
@@ -150,8 +157,9 @@ class WordPicture(object):
 
   # Draws into a square (0, 0) to (1, 1), positive x going right on
   # the screen, positive y going up.
-  def Render(self, rtime):
+  def Render(self, rtime, unrender_time=-10):
     glUniform1f(Shaders.line_drawing_time, rtime)
+    glUniform1f(Shaders.line_drawing_untime, unrender_time)
     glEnableClientState(GL_VERTEX_ARRAY)
     glVertexPointer(4, GL_FLOAT, 16, self.v_array)
     glDrawArrays(GL_LINE_STRIP, 0, self.n)
@@ -214,7 +222,7 @@ def main_hack():
     t += dt / 1000.
     GL.glClear(GL.GL_COLOR_BUFFER_BIT)
     word.RenderSetup()
-    word.Render(t)
+    word.Render(t, t - 4.0)
     pygame.display.flip()
 
 
