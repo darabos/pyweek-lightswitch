@@ -136,7 +136,7 @@ class WordPicture(object):
   # Sets up misc. render state for drawing word pictures. Can be
   # called once followed by many Render calls.
   @classmethod
-  def RenderSetup(cls):
+  def RenderSetup(cls, main_color, tip_color):
     glEnable(GL_LINE_SMOOTH)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE)
@@ -151,9 +151,9 @@ class WordPicture(object):
     l = glGetUniformLocation(prg, b'unrender_pre_time')
     glUniform1f(l, 0.4)
     l = glGetUniformLocation(prg, b'main_color')
-    glUniform4f(l, 1, 1, 1, 1)
+    glUniform4f(l, *main_color)
     l = glGetUniformLocation(prg, b'tip_color')
-    glUniform4f(l, 2, 0.3, 0.3, 1)
+    glUniform4f(l, *tip_color)
 
   # Draws into a square (0, 0) to (1, 1), positive x going right on
   # the screen, positive y going up.
@@ -164,7 +164,6 @@ class WordPicture(object):
     glVertexPointer(4, GL_FLOAT, 16, self.v_array)
     glDrawArrays(GL_LINE_STRIP, 0, self.n)
     glDisableClientState(GL_VERTEX_ARRAY)
-    pass
 
 
 # If there is no picture for a word, the picture for one of these
@@ -221,8 +220,8 @@ def main_hack():
 
     t += dt / 1000.
     GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-    word.RenderSetup()
-    word.Render(t, t - 4.0)
+    word.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
+    word.Render(t, t - 1.2)
     pygame.display.flip()
 
 if __name__ == '__main__':
