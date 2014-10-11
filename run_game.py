@@ -126,6 +126,8 @@ class Game(object):
     self.rule = RandomRule()
     self.words = []
     self.successes = 0
+    self.victory = False
+    self.victory_pictures = []
 
   def Loop(self):
     pygame.init()
@@ -143,45 +145,30 @@ class Game(object):
     picture_render.Shaders.Setup()
     self.time = 0
     self.pictures = []
+    self.background = 0
 
     while True:
       dt = clock.tick(60)
       self.time += dt / 1000.0
       for e in pygame.event.get():
         if e.type == pygame.KEYDOWN:
-          if ord('a') <= e.key <= ord('z'):
-            self.word += chr(e.key)
-          elif e.key == pygame.K_BACKSPACE:
-            self.word = self.word[:-1]
-          elif e.key == pygame.K_RETURN:
-            p = picture_render.WordPictureForWord(self.word)
-            p.start = self.time
-            if self.rule.accepts(self.word):
-              p.primary = 0.3, 2, 0.3, 1
-              p.secondary = 1, 1, 1, 1
-              self.successes += 1
-            else:
-              p.primary = 2, 0.3, 0.3, 1
-              p.secondary = 1, 1, 1, 1
-              self.successes = 0
-            self.pictures.append(p)
-
-            if self.successes == 5:
-              for w in self.words:
-                p = picture_render.WordPictureForWord(self.word)
-                p.start = self.time
-                p.primary = 1, 1, 1, 1
-                p.secondary = 1, 1, 1, 1
-                self.pictures.append(p)
-              self.reset()
-
-            self.words.append(self.word)
-            self.word = ''
+          self.HandleKey(e.key)
         if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
           pygame.quit()
           sys.exit(0)
+
+      if self.victory:
+        self.background += 0.05
+        if self.background > 1:
+          self.background = 1
+      else:
+        self.background -= 0.05
+        if self.background < 0:
+          self.background = 0
+      glClearColor(self.background, self.background, self.background, 1)
       glClear(GL_COLOR_BUFFER_BIT)
       glLoadIdentity()
+
       with Transform():
         glTranslate(0, 100, 0)
         glScale(300, 300, 1.0)
@@ -191,15 +178,57 @@ class Game(object):
             s = 1.0 + t * 0.1
             glScale(s, s, 1.0)
             glTranslate(-0.5, -0.5, 0)
-            p.RenderSetup(p.primary, p.secondary)
             if t < 2:
+              p.RenderSetup(p.primary, p.secondary)
               p.Render(t)
             elif t < 3:
+              p.RenderSetup(p.primary, (0, 0, 0, 0))
               p.Render(3 - t)
             else:
               self.pictures.remove(p)
+
+        if self.victory:
+          for p in self.victory_pictures:
+            with Transform():
+              glTranslate(-0.5 + p.x, -0.5 + p.y, 0)
+              glScale(p.scale, p.scale, 1.0)
+              p.RenderSetup((0, 0, 0, 1), (0, 0, 0, 1))
+              p.Render(2)
+
       self.font.Render(0, -200, self.word.upper())
       pygame.display.flip()
+
+  def HandleKey(self, key):
+    if self.victory:
+      self.reset()
+      return
+    if ord('a') <= key <= ord('z'):
+      self.word += chr(key)
+    elif key == pygame.K_BACKSPACE:
+      self.word = self.word[:-1]
+    elif key == pygame.K_RETURN:
+      p = picture_render.WordPictureForWord(self.word)
+      p.start = self.time
+      if self.rule.accepts(self.word):
+        p.primary = 0.3, 2, 0.3, 1
+        p.secondary = 1, 1, 1, 1
+        self.successes += 1
+        self.victory_pictures.append(p)
+      else:
+        p.primary = 2, 0.3, 0.3, 1
+        p.secondary = 1, 1, 1, 1
+        self.successes = 0
+      self.pictures.append(p)
+
+      if self.successes == 5:
+        self.victory = True
+        for p in self.victory_pictures:
+          p.scale = random.uniform(0.3, 0.5)
+          p.x = random.uniform(-0.8, 0.8)
+          p.y = random.uniform(-0.5, 0.5)
+
+      self.words.append(self.word)
+      self.word = ''
 
 
 if __name__ == '__main__':

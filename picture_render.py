@@ -95,7 +95,7 @@ class WordPicture(object):
   def RenderSetup(cls, main_color, tip_color):
     glEnable(GL_LINE_SMOOTH)
     glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glLineWidth(4)
 
     prg = Shaders.line_drawing_program
