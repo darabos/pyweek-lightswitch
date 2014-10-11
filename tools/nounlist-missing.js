@@ -10,7 +10,6 @@ var words = [
   'armor',
   'python',
   'cowboy',
-  'armor',
   'movie',
   'film',
   'castle',
@@ -38,4 +37,5 @@ var words = [
   'wizard',
   'barbarian',
   'guy',
+  'anchor',
   ];
