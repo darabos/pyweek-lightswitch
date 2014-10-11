@@ -144,11 +144,21 @@ class Game(object):
       glClear(GL_COLOR_BUFFER_BIT)
       glLoadIdentity()
       with Transform():
+        glTranslate(0, 100, 0)
         glScale(300, 300, 1.0)
-        glTranslate(-0.5, -0.2, 0)
-        for p in self.pictures:
-          p.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
-          p.Render(self.time - p.start)
+        for p in self.pictures[:]:
+          with Transform():
+            t = self.time - p.start
+            s = 1.0 + t * 0.1
+            glScale(s, s, 1.0)
+            glTranslate(-0.5, -0.5, 0)
+            p.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
+            if t < 2:
+              p.Render(t)
+            elif t < 3:
+              p.Render(3 - t)
+            else:
+              self.pictures.remove(p)
       self.font.Render(0, -200, self.word)
       pygame.display.flip()
 
