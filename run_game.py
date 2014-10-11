@@ -149,34 +149,8 @@ class Game(object):
       self.time += dt / 1000.0
       for e in pygame.event.get():
         if e.type == pygame.KEYDOWN:
-          if ord('a') <= e.key <= ord('z'):
-            self.word += chr(e.key)
-          elif e.key == pygame.K_BACKSPACE:
-            self.word = self.word[:-1]
-          elif e.key == pygame.K_RETURN:
-            p = picture_render.WordPictureForWord(self.word)
-            p.start = self.time
-            if self.rule.accepts(self.word):
-              p.primary = 0.3, 2, 0.3, 1
-              p.secondary = 1, 1, 1, 1
-              self.successes += 1
-            else:
-              p.primary = 2, 0.3, 0.3, 1
-              p.secondary = 1, 1, 1, 1
-              self.successes = 0
-            self.pictures.append(p)
+          self.HandleKey(e.key)
 
-            if self.successes == 5:
-              for w in self.words:
-                p = picture_render.WordPictureForWord(self.word)
-                p.start = self.time
-                p.primary = 1, 1, 1, 1
-                p.secondary = 1, 1, 1, 1
-                self.pictures.append(p)
-              self.reset()
-
-            self.words.append(self.word)
-            self.word = ''
         if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
           pygame.quit()
           sys.exit(0)
@@ -200,6 +174,36 @@ class Game(object):
               self.pictures.remove(p)
       self.font.Render(0, -200, self.word.upper())
       pygame.display.flip()
+
+  def HandleKey(self, key):
+    if ord('a') <= key <= ord('z'):
+      self.word += chr(key)
+    elif key == pygame.K_BACKSPACE:
+      self.word = self.word[:-1]
+    elif key == pygame.K_RETURN:
+      p = picture_render.WordPictureForWord(self.word)
+      p.start = self.time
+      if self.rule.accepts(self.word):
+        p.primary = 0.3, 2, 0.3, 1
+        p.secondary = 1, 1, 1, 1
+        self.successes += 1
+      else:
+        p.primary = 2, 0.3, 0.3, 1
+        p.secondary = 1, 1, 1, 1
+        self.successes = 0
+      self.pictures.append(p)
+
+      if self.successes == 5:
+        for w in self.words:
+          p = picture_render.WordPictureForWord(self.word)
+          p.start = self.time
+          p.primary = 1, 1, 1, 1
+          p.secondary = 1, 1, 1, 1
+          self.pictures.append(p)
+        self.reset()
+
+      self.words.append(self.word)
+      self.word = ''
 
 
 if __name__ == '__main__':
