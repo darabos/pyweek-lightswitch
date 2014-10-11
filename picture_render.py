@@ -129,7 +129,7 @@ class WordPictureLoader(object):
 
   def WordPictureForWord(self, word):
     if word not in self.all_words:
-      word = random.choice()
+      word = random.choice(self.all_words)
     raw_data = self.source.read(word)
     return WordPicture(raw_data)
 

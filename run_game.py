@@ -146,6 +146,7 @@ class Game(object):
     self.time = 0
     self.pictures = []
     self.background = 0
+    self.wpl = picture_render.WordPictureLoader()
 
     while True:
       dt = clock.tick(60)
@@ -207,7 +208,7 @@ class Game(object):
     elif key == pygame.K_BACKSPACE:
       self.word = self.word[:-1]
     elif key == pygame.K_RETURN:
-      p = picture_render.WordPictureForWord(self.word)
+      p = self.wpl.WordPictureForWord(self.word)
       p.start = self.time
       if self.rule.accepts(self.word):
         p.primary = 0.3, 2, 0.3, 1
