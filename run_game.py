@@ -147,7 +147,7 @@ class Game(object):
         glScale(300, 300, 1.0)
         glTranslate(-0.5, -0.2, 0)
         for p in self.pictures:
-          p.RenderSetup()
+          p.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
           p.Render(self.time - p.start)
       self.font.Render(0, -200, self.word)
       pygame.display.flip()
