@@ -43,11 +43,11 @@ var log = [];
 var logStart, strip;
 
 var canvas = document.getElementsByTagName('canvas')[0];
-var bb = canvas.getBoundingClientRect();
 var ctx = canvas.getContext('2d');
 var ox, oy, oox, ooy;
 
 canvas.addEventListener('mousedown', function(e) {
+  var bb = canvas.getBoundingClientRect();
   var x = Math.floor(e.clientX - bb.left), y = Math.floor(e.clientY - bb.top);
   oox = ox = x;
   ooy = oy = y;
@@ -63,6 +63,7 @@ canvas.addEventListener('mouseup', function(e) {
 });
 
 canvas.addEventListener('mousemove', function(e) {
+  var bb = canvas.getBoundingClientRect();
   var x = Math.floor(e.clientX - bb.left), y = Math.floor(e.clientY - bb.top);
   if (e.buttons) {
     ctx.lineWidth = e.mozPressure * 10;
@@ -78,6 +79,7 @@ canvas.addEventListener('mousemove', function(e) {
 });
 
 function clear() {
+  var bb = canvas.getBoundingClientRect();
   ctx.clearRect(0, 0, bb.width, bb.height);
   log = [];
   logStart = undefined;
