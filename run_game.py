@@ -11,6 +11,13 @@ from OpenGL.GL import *
 
 WIDTH, HEIGHT = 800, 600
 
+SOUNDS = {
+  'accepted': 'sounds/cor.ogg',
+  'rejected': 'sounds/wrong.ogg',
+}
+
+MUSIC = ['sounds/lightswitch.ogg']
+
 
 def Quad(width, height):
   glBegin(GL_TRIANGLE_STRIP)
@@ -95,16 +102,83 @@ class Font(object):
 
 
 class ContainsRule(object):
-
   def __init__(self, letter):
     self.letter = letter
-
   def accepts(self, word):
     return self.letter in word
+  def hint(self):
+    return 'Hint: Guess my favorite letter!'
 
 
+class EndsWithRule(object):
+  def __init__(self, letters):
+    self.letters = letters
+  def accepts(self, word):
+    return word[-1] in self.letters
+  def hint(self):
+    return 'Hint: The word ends with you!'
+
+
+class StartsWithRule(object):
+  def __init__(self, letters):
+    self.letters = letters
+  def accepts(self, word):
+    return word[0] in self.letters
+  def hint(self):
+    return 'Hint: It all starts with the word itself...'
+
+
+class LengthRule(object):
+  def __init__(self, length):
+    self.length = length
+  def accepts(self, word):
+    return len(word) == self.length
+  def hint(self):
+    return 'Hint: Not too long, not too short...'
+
+
+class MusicalRule(object):
+  def accepts(self, word):
+    for x in 'do re mi fa sol la ti'.split():
+      if x in word:
+        return True
+    return False
+  def hint(self):
+    return 'Hint: You hear sounds of music from the room...'
+
+
+class DoubleLetterRule(object):
+  def accepts(self, word):
+    last = None
+    for c in word:
+      if c == last:
+        return True
+      last = c
+    return False
+  def hint(self):
+    return 'Hint: Double, Double, Toil and Trouble...'
+
+
+letters = string.lowercase.replace('x', '')
+vowels = 'aeiou'
+consonants = [l for l in letters if l not in vowels]
+next_rules = []
 def RandomRule():
-  return ContainsRule(random.choice(string.lowercase))
+  if not next_rules:
+    next_rules.append(MusicalRule())
+    next_rules.append(DoubleLetterRule())
+    next_rules.append(EndsWithRule(consonants))
+    next_rules.append(EndsWithRule(vowels))
+    for i in range(3):
+      next_rules.append(StartsWithRule(random.choice(letters)))
+    for i in range(6):
+      next_rules.append(ContainsRule(random.choice(letters)))
+    for i in range(2):
+      next_rules.append(LengthRule(random.randint(3, 6)))
+    random.shuffle(next_rules)
+  rule = next_rules.pop()
+  print rule.hint()
+  return rule
 
 
 class Game(object):
@@ -138,10 +212,18 @@ class Game(object):
     self.pictures = []
     self.background = 0
     self.wpl = picture_render.WordPictureLoader()
+    for k, v in SOUNDS.items():
+      SOUNDS[k] = pygame.mixer.Sound(v)
 
     while True:
       dt = clock.tick(60)
       self.time += dt / 1000.0
+      if not pygame.mixer.music.get_busy():
+        m = MUSIC.pop()
+        pygame.mixer.music.load(m)
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play()
+        MUSIC.insert(0, m)
       for e in pygame.event.get():
         if e.type == pygame.KEYDOWN:
           self.HandleKey(e.key)
@@ -198,16 +280,18 @@ class Game(object):
       self.word += chr(key)
     elif key == pygame.K_BACKSPACE:
       self.word = self.word[:-1]
-    elif key == pygame.K_RETURN:
+    elif key == pygame.K_RETURN and self.word:
       p = self.wpl.WordPictureForWord(self.word)
       p.start = self.time
       if self.rule.accepts(self.word):
+        SOUNDS['accepted'].play()
         p.primary = 0.3, 2, 0.3, 1
         p.secondary = 1, 1, 1, 1
         if self.word not in self.victory_pictures:
           self.successes += 1
           self.victory_pictures[self.word] = p
       else:
+        SOUNDS['rejected'].play()
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
         self.successes = 0

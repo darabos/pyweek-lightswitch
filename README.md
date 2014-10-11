@@ -2,7 +2,13 @@ Lightswitch
 ===========
 
 A team entry in PyWeek #19  <http://www.pyweek.org/19/>
-by Alexander Malmberg and Daniel Darabos.
+
+  - Code: Alexander Malmberg and Daniel Darabos
+  - Sounds: Christopher Malmberg
+  - Music: Andras Barjak
+  - Art: Daniel Darabos
+  - Font: Licensed under Apache License, created by Steve Matteson
+    (not a member of the team)
 
 
 
@@ -37,7 +43,12 @@ accepted. There is a rule for what words are accepted. The rule is picked at
 random. You have to figure out the rule and submit 5 accepted items in a row
 to win. The room is then revealed.
 
-(Note that repeating the same item 5 times will not work.)
+Note that repeating the same item 5 times will not work.
+
+Hints are printed in the terminal. You can choose your difficulty by hiding
+or revealing the terminal while playing. For extra easy difficulty you can
+start using gobbledygook, nonsense words, or just hammering the keyboard like
+you always wanted.
 
 
 
