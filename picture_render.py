@@ -166,16 +166,10 @@ class WordPicture(object):
     glDisableClientState(GL_VERTEX_ARRAY)
 
 
-# If there is no picture for a word, the picture for one of these
-# words will be used instead.
-# TODO(malmberg): replace with suitable words from the full list once available
-FALLBACK_WORDS = ['aardvark']
-
-
 def WordPictureForWord(word):
   data = pictures_light.words.get(word)
   if data is None:
-    fallback = random.sample(FALLBACK_WORDS, 1)[0]
+    fallback = random.choice(pictures_light.words.keys())
     data = pictures_light.words[fallback]
 
   return WordPicture(data)
