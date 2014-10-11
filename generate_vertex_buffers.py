@@ -1,6 +1,12 @@
 import ctypes
 import zipfile
 
+# The full pictures.py was too large to comfortably parse on my
+# system, so I manually split it into smaller parts and ran this
+# program repeatedly.
+#
+# (Also, gore-tex is broken, so remove that one, and throw in 'NaN =
+# None' at the top of every file to deal with some broken values.)
 import pictures_3
 
 all_the_words = pictures_3.words
