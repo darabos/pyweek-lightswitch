@@ -13,4 +13,10 @@ var words = [
   'pirate',
   'alexander',
   'andras',
+  'ogre',
+  'troll',
+  'warrior',
+  'mage',
+  'wizard',
+  'barbarian',
   ];
