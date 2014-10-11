@@ -26,15 +26,6 @@ def Quad(width, height):
 
 
 @contextlib.contextmanager
-def Buffer(buf):
-  glBindFramebuffer(GL_FRAMEBUFFER, buf)
-  glViewport(0, 0, WIDTH * 2, HEIGHT * 2)
-  yield
-  glBindFramebuffer(GL_FRAMEBUFFER, 0)
-  glViewport(0, 0, WWIDTH, WHEIGHT)
-
-
-@contextlib.contextmanager
 def Texture(tex):
   glEnable(GL_TEXTURE_2D)
   glBindTexture(GL_TEXTURE_2D, tex)
@@ -180,10 +171,10 @@ class Game(object):
             glScale(s, s, 1.0)
             glTranslate(-0.5, -0.5, 0)
             if t < 2:
-              p.RenderSetup(p.primary, p.secondary)
+              p.RenderSetup(p.primary, p.secondary, WIDTH, HEIGHT)
               p.Render(t)
             elif t < 3:
-              p.RenderSetup(p.primary, (0, 0, 0, 0))
+              p.RenderSetup(p.primary, (0, 0, 0, 0), WIDTH, HEIGHT)
               p.Render(3 - t)
             else:
               self.pictures.remove(p)
@@ -193,7 +184,7 @@ class Game(object):
             with Transform():
               glTranslate(-0.5 + p.x, -0.5 + p.y, 0)
               glScale(p.scale, p.scale, 1.0)
-              p.RenderSetup((0, 0, 0, 1), (0, 0, 0, 1))
+              p.RenderSetup((0, 0, 0, 1), (0, 0, 0, 1), WIDTH, HEIGHT)
               p.Render(2)
 
       self.font.Render(0, -200, self.word.upper())

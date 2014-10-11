@@ -38,15 +38,27 @@ class Shaders(object):
 varying float time;
 varying float pressure;
 
+flat varying float line_dist;
+flat varying vec2 line_normal;
+
 void main() {
   gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xy, 0, 1);
   time = gl_Vertex.z;
   pressure = gl_Vertex.w;
+
+  vec2 next_vert = (gl_ModelViewProjectionMatrix * vec4(gl_Color.xy, 0, 1)).xy;
+  vec2 normal = vec2(next_vert.y - gl_Position.y, gl_Position.x - next_vert.x);
+  normal = normalize(normal);
+  line_normal = normal;
+  line_dist = dot(normal, next_vert);
 }""", """
 #version 120
 
 varying float time;
 varying float pressure;
+
+flat varying float line_dist;
+flat varying vec2 line_normal;
 
 uniform float render_time;
 uniform float unrender_time;
@@ -57,26 +69,46 @@ uniform float unrender_pre_time;
 uniform vec4 main_color;
 uniform vec4 tip_color;
 
+uniform int viewport_width;
+uniform int viewport_height;
+
 void main() {
-  vec4 c;
+  vec3 c;
+  float actual_pressure = 0;
   if (time > render_time + render_pre_time) {
-    c = vec4(0, 0, 0, 0);
+    c = vec3(0, 0, 0);
   } else if (time > render_time) {
     float a = (time - render_time) / render_pre_time;
-    c = mix(vec4(0, 0, 0, 0), tip_color, a);
+    c = mix(vec3(0, 0, 0), tip_color.rgb, a);
   } else if (time > render_time - render_post_time) {
     float a = (render_time - time) / render_post_time;
-    c = mix(tip_color, vec4(main_color.xyz, pressure), a);
+    c = mix(tip_color.rgb, main_color.rgb, a);
+    actual_pressure = pressure * 2 * a;
   } else if (time > unrender_time + unrender_pre_time) {
-    c = vec4(main_color.xyz, pressure);
+    c = main_color.rgb;
+    actual_pressure = pressure;
   } else if (time > unrender_time) {
     float a = (time - unrender_time) / unrender_pre_time;
-    c = mix(vec4(0, 0, 0, 0), vec4(main_color.xyz, pressure), a);
+    c = mix(vec3(0, 0, 0), main_color.rgb, a);
+    actual_pressure = pressure * a;
   } else {
-    c = vec4(0, 0, 0, 0);
+    c = vec3(0, 0, 0);
   }
 
-  gl_FragColor = c;
+  gl_FragColor.rgb = c;
+  if (actual_pressure < 0.01) {
+    gl_FragColor.a = 0;
+  } else {
+    vec2 coord = vec2(gl_FragCoord.x / viewport_width,
+                      gl_FragCoord.y / viewport_height);
+    coord.x -= 1;
+    coord.y -= 1;
+    float dist = abs(dot(coord, line_normal) - line_dist);
+
+    dist = 1 - clamp(dist * 100 - actual_pressure / 10., 0, 1);
+
+    gl_FragColor.a = dist;
+  }
 }
 """)
     self.line_drawing_time = glGetUniformLocation(self.line_drawing_program,
@@ -87,16 +119,17 @@ void main() {
 class WordPicture(object):
   def __init__(self, vbuf):
     self.v_array = vbuf
+    self.shifted_v_array = vbuf[16:] + ('0' * 16)
     self.n = len(vbuf) / 16
 
   # Sets up misc. render state for drawing word pictures. Can be
   # called once followed by many Render calls.
   @classmethod
-  def RenderSetup(cls, main_color, tip_color):
+  def RenderSetup(cls, main_color, tip_color, viewport_width, viewport_height):
     glEnable(GL_LINE_SMOOTH)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glLineWidth(4)
+    glLineWidth(10)
 
     prg = Shaders.line_drawing_program
     glUseProgram(prg)
@@ -110,6 +143,11 @@ class WordPicture(object):
     glUniform4f(l, *main_color)
     l = glGetUniformLocation(prg, b'tip_color')
     glUniform4f(l, *tip_color)
+    l = glGetUniformLocation(prg, b'viewport_width')
+    glUniform1i(l, viewport_width / 2)
+    l = glGetUniformLocation(prg, b'viewport_height')
+    glUniform1i(l, viewport_height / 2)
+    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION)
 
   # Draws into a square (0, 0) to (1, 1), positive x going right on
   # the screen, positive y going up.
@@ -117,9 +155,12 @@ class WordPicture(object):
     glUniform1f(Shaders.line_drawing_time, rtime)
     glUniform1f(Shaders.line_drawing_untime, unrender_time)
     glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
     glVertexPointer(4, GL_FLOAT, 16, self.v_array)
+    glColorPointer(4, GL_FLOAT, 16, self.shifted_v_array)
     glDrawArrays(GL_LINE_STRIP, 0, self.n)
     glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_COLOR_ARRAY)
 
 
 class WordPictureLoader(object):
@@ -160,6 +201,8 @@ def main_hack():
   word = wpl.WordPictureForWord(w)
   print w
 
+  glViewport(0, 0, 600, 600)
+
   clock = pygame.time.Clock()
   t = 0
   while True:
@@ -173,7 +216,7 @@ def main_hack():
 
     t += dt / 1000.
     GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-    word.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0))
+    word.RenderSetup((1, 1, 1, 1), (2.0, 0.3, 0.3, 1.0), 600, 600)
     word.Render(t, t - 5.0)
     pygame.display.flip()
 
