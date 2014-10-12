@@ -1,4 +1,4 @@
-// From http://www.desiquintans.com/articles.php?page=nounlist.
+// Words missing from nounlist.js that we want a drawing for.
 
 var words = [
   'candy',
@@ -42,4 +42,22 @@ var words = [
   'igloo',
   'clown',
   'vampire',
+  'dino',
+  'penguin',
+  'skull',
+  'laser',
+  'meteor',
+  'comet',
+  'ham',
+  'potion',
+  'demon',
+  'rhubarb',
+  'yoghurt',
+  'asteroid',
+  'portal',
+  'mushroom',
+  'fungus',
+  'pool',
+  'mug',
+  'parasol',
   ];
