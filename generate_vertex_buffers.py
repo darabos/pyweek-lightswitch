@@ -7,7 +7,7 @@ import zipfile
 #
 # (Also, gore-tex is broken, so remove that one, and throw in 'NaN =
 # None' at the top of every file to deal with some broken values.)
-import pictures_missing_3 as pictures
+import pictures_missing_4 as pictures
 
 all_the_words = pictures.words
 
