@@ -192,6 +192,7 @@ class Game(object):
     self.rule = RandomRule()
     self.words = []
     self.successes = 0
+    self.misses = 0
     self.victory = False
     self.victory_pictures = {}
 
@@ -272,7 +273,8 @@ class Game(object):
               p.Render(2)
 
       self.font.Render(0, -200, self.word.upper())
-      self.hint_font.Render(0, -260, self.rule.hint())
+      if self.misses >= 3:
+        self.hint_font.Render(0, -260, self.rule.hint())
       pygame.display.flip()
 
   def HandleKey(self, key):
@@ -300,6 +302,7 @@ class Game(object):
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
         self.successes = 0
+        self.misses += 1
       self.pictures.append(p)
 
       if self.successes == 5:
