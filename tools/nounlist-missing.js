@@ -96,10 +96,22 @@ var words = [
   'pile',
   'cliff',
   'photo',
+  'assassin',
+  'sniper',
+  'moth',
+  'butterfly',
+  'cradle',
+  'waffle',
+  'elevator',
+  'windmill',
+  'globe',
+  'wife',
+  'husband',
+  'pretzel',
+  'backpack',
+  'handbag',
   ];
 
 // The words above are done.
 words = [
-  'assassin',
-  'sniper',
   ];
