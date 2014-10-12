@@ -7,9 +7,9 @@ import zipfile
 #
 # (Also, gore-tex is broken, so remove that one, and throw in 'NaN =
 # None' at the top of every file to deal with some broken values.)
-import pictures_3
+import pictures_missing as pictures
 
-all_the_words = pictures_3.words
+all_the_words = pictures.words
 
 OUTPUT = 'pictures_vbuf.zip'
 
