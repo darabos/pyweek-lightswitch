@@ -9,9 +9,16 @@ def CompileShader(src, kind, kind_name, name):
   glCompileShader(shader)
   result = glGetShaderiv(shader, GL_COMPILE_STATUS)
   if not result:
-    print ('Shader compilation failed (%s, %s): %s'
-           % (name, kind_name, glGetShaderInfoLog(shader)))
-    sys.exit(1)
+    # Super-ugly hack. Remove 'flat' and try again since it isn't
+    # really a v120 feature.
+    src = src.replace('flat ', '')
+    glShaderSource(shader, [src])
+    glCompileShader(shader)
+    result = glGetShaderiv(shader, GL_COMPILE_STATUS)
+    if not result:
+      print ('Shader compilation failed (%s, %s): %s'
+             % (name, kind_name, glGetShaderInfoLog(shader)))
+      sys.exit(1)
   return shader
 
 
