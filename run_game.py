@@ -186,6 +186,7 @@ class Game(object):
 
   def __init__(self):
     self.word = ''
+    self.games_played = -1
     self.reset()
 
   def reset(self):
@@ -195,6 +196,7 @@ class Game(object):
     self.misses = 0
     self.victory = False
     self.victory_pictures = {}
+    self.games_played += 1
 
   def Loop(self):
     pygame.init()
@@ -273,7 +275,7 @@ class Game(object):
               p.Render(2)
 
       self.font.Render(0, -200, self.word.upper())
-      if self.misses >= 3:
+      if self.misses >= 3 + self.games_played:
         self.hint_font.Render(0, -260, self.rule.hint())
       pygame.display.flip()
 
