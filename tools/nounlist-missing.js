@@ -66,3 +66,8 @@ var words = [
   'ado',
   'premortem',
   ];
+
+// The words above are done.
+words = [
+  'fairy',
+  ];
