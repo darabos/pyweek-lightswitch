@@ -98,9 +98,12 @@ uniform int viewport_width;
 uniform int viewport_height;
 
 void main() {
+  if (pressure <= 0) {
+    discard;
+  }
+
   vec3 c;
   float a_mult = 1.0;
-  float effective_pressure = pressure;
   if (time > render_time + render_pre_time) {
     c = vec3(0, 0, 0);
     discard;
@@ -108,17 +111,13 @@ void main() {
     float a = (time - render_time) / render_pre_time;
     c = tip_color.rgb;
     a_mult = 1 - a;
-    effective_pressure += a * 0.1;
-//    c = mix(vec3(0, 0, 0), tip_color.rgb, a);
   } else if (time > render_time - render_post_time) {
     float a = (render_time - time) / render_post_time;
     c = mix(tip_color.rgb, main_color.rgb, a);
-    effective_pressure += a * 0.1;
   } else if (time > unrender_time + unrender_pre_time) {
     c = main_color.rgb;
   } else if (time > unrender_time) {
     float a = (time - unrender_time) / unrender_pre_time;
-    //c = mix(vec3(0, 0, 0), main_color.rgb, a);
     c = main_color.rgb;
     a_mult = a;
   } else {
@@ -126,12 +125,8 @@ void main() {
     discard;
   }
 
-  if (effective_pressure <= 0) {
-    discard;
-  }
-
   gl_FragColor.rgb = c;
-  float width = effective_pressure * 0.005;
+  float width = pressure * 0.005;
   vec2 coord = vec2(gl_FragCoord.x / viewport_width - 1,
                     gl_FragCoord.y / viewport_height - 1);
 
