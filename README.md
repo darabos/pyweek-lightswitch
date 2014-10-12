@@ -43,10 +43,10 @@ accepted. There is a rule for what words are accepted. The rule is picked at
 random. You have to figure out the rule and submit 5 accepted items in a row
 to win. The room is then revealed.
 
-Note that repeating the same item 5 times will not work.
+Note that repeating the same item multiple times will not work. You need to
+find 5 new words to win.
 
-Hints are printed in the terminal. You can choose your difficulty by hiding
-or revealing the terminal while playing. For extra easy difficulty you can
+Hints are revealed after a few rejected words. For extra-easy mode you can
 start using gobbledygook, nonsense words, or just hammering the keyboard like
 you always wanted.
 
