@@ -3,6 +3,7 @@ import contextlib
 import math
 import os
 import picture_render
+#import picture_render_simple as picture_render
 import pygame
 import random
 import string

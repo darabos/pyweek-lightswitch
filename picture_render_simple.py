@@ -15,14 +15,25 @@ class WordPicture(object):
 
   @classmethod
   def RenderSetup(cls, main_color, tip_color, viewport_width, viewport_height):
-    pass
+    WordPicture.main_color = main_color
+    WordPicture.tip_color = tip_color
 
   def Render(self, rtime):
-    for strip in pictures.words[self.word]:
+    picture = pictures.words[self.word]
+    max_time = float(picture[-1][-1].time)
+    glColor(*WordPicture.main_color)
+    erasing = WordPicture.tip_color == (0, 0, 0, 0)
+    for strip in picture:
       if len(strip) < 2: continue
+      if erasing:
+        strip = list(reversed(strip))
       oop = strip[0]
       op = strip[1]
       for p in strip[2:]:
+        if erasing and (1 - rtime) > p.time / max_time:
+          break
+        if not erasing and rtime < p.time / max_time:
+          break
         glLineWidth(op.pressure * 0.01)
         glBegin(GL_LINES)
         glVertex2d(oop.x / 500.0, 1 - oop.y / 500.0)
@@ -30,7 +41,7 @@ class WordPicture(object):
         glEnd()
         oop = op
         op = p
-
+    glColor(1, 1, 1, 1)
 
 
 class WordPictureLoader(object):
