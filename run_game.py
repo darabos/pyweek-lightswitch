@@ -208,6 +208,7 @@ class Game(object):
     clock = pygame.time.Clock()
     pygame.font.init()
     self.font = Font(40)
+    self.hint_font = Font(20)
     picture_render.Shaders.Setup()
     self.time = 0
     self.pictures = []
@@ -271,6 +272,7 @@ class Game(object):
               p.Render(2)
 
       self.font.Render(0, -200, self.word.upper())
+      self.hint_font.Render(0, -260, self.rule.hint())
       pygame.display.flip()
 
   def HandleKey(self, key):
