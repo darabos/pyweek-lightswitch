@@ -118,8 +118,7 @@ void main() {
     c = main_color.rgb;
   } else if (time > unrender_time) {
     float a = (time - unrender_time) / unrender_pre_time;
-    c = main_color.rgb;
-    a_mult = a;
+    c = mix(vec3(0, 0, 0), main_color.rgb, a);
   } else {
     c = vec3(0, 0, 0);
     discard;
