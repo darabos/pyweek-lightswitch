@@ -60,4 +60,9 @@ var words = [
   'pool',
   'mug',
   'parasol',
+  'universe',
+  'mummy',
+  'fool',
+  'ado',
+  'premortem',
   ];
