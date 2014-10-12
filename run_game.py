@@ -178,7 +178,6 @@ def RandomRule():
       next_rules.append(LengthRule(random.randint(3, 6)))
     random.shuffle(next_rules)
   rule = next_rules.pop()
-  print rule.hint()
   return rule
 
 
@@ -192,7 +191,7 @@ class Game(object):
   def reset(self):
     self.rule = RandomRule()
     self.words = []
-    self.successes = 0
+    self.score = 0
     self.misses = 0
     self.victory = False
     self.victory_pictures = {}
@@ -288,26 +287,33 @@ class Game(object):
     elif key == pygame.K_BACKSPACE:
       self.word = self.word[:-1]
     elif key == pygame.K_RETURN and self.word:
-      p = self.wpl.WordPictureForWord(self.word)
-      p.start = self.time
       if self.rule.accepts(self.word):
         SOUNDS['accepted'].play()
-        p.accepted = True
-        p.primary = 0.3, 2, 0.3, 1
-        p.secondary = 1, 1, 1, 1
         if self.word not in self.victory_pictures:
-          self.successes += 1
+          p = self.wpl.WordPictureForWord(self.word)
+          self.score += 1
           self.victory_pictures[self.word] = p
+          p.primary = 0.3, 2, 0.3, 1
+          p.secondary = 1, 1, 1, 1
+        else:
+          p = self.victory_pictures[self.word]
+          p.primary = 0.8, 0.8, 0.8, 1
+          p.secondary = 0, 0, 0, 0
+        p.accepted = True
       else:
+        p = self.wpl.WordPictureForWord(self.word)
         SOUNDS['rejected'].play()
         p.accepted = False
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
-        self.successes = 0
+        self.score -= 1
+        if self.score < 0: self.score = 0
         self.misses += 1
+      p.start = self.time
       self.pictures.append(p)
+      print 'Current score:', self.score
 
-      if self.successes == 5:
+      if self.score == 5:
         self.victory = True
         for p in self.victory_pictures.values():
           p.scale = random.uniform(0.3, 0.5)
