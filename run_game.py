@@ -253,12 +253,12 @@ class Game(object):
             s = 1.0 + t * 0.1
             glScale(s, s, 1.0)
             glTranslate(-0.5, -0.5, 0)
-            if t < 3:
+            if t < 3.5:
               p.RenderSetup(p.primary, p.secondary, WIDTH, HEIGHT)
               if p.accepted:
                 p.Render(t, t - 2.5)
               else:
-                p.Render(t, t - 0.8)
+                p.Render(t, t - 1.2)
             else:
               self.pictures.remove(p)
 
