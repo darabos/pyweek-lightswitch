@@ -87,7 +87,6 @@ var words = [
   'lightswitch',
   'spork',
   'hunter',
-  'zoo',
   'egyptian',
   'pole',
   'unicorn',
@@ -101,4 +100,6 @@ var words = [
 
 // The words above are done.
 words = [
+  'assassin',
+  'sniper',
   ];
