@@ -255,7 +255,10 @@ class Game(object):
             glTranslate(-0.5, -0.5, 0)
             if t < 3:
               p.RenderSetup(p.primary, p.secondary, WIDTH, HEIGHT)
-              p.Render(t, t - 1.5)
+              if p.accepted:
+                p.Render(t, t - 2.5)
+              else:
+                p.Render(t, t - 0.8)
             else:
               self.pictures.remove(p)
 
@@ -283,6 +286,7 @@ class Game(object):
       p.start = self.time
       if self.rule.accepts(self.word):
         SOUNDS['accepted'].play()
+        p.accepted = True
         p.primary = 0.3, 2, 0.3, 1
         p.secondary = 1, 1, 1, 1
         if self.word not in self.victory_pictures:
@@ -290,6 +294,7 @@ class Game(object):
           self.victory_pictures[self.word] = p
       else:
         SOUNDS['rejected'].play()
+        p.accepted = False
         p.primary = 2, 0.3, 0.3, 1
         p.secondary = 1, 1, 1, 1
         self.successes = 0
