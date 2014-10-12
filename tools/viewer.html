@@ -1,0 +1,90 @@
+<html>
+<meta charset="utf-8">
+<style>
+
+body {
+  text-align: center;
+  padding: 20px;
+}
+
+canvas {
+  box-shadow: 0px 10px 20px;
+}
+
+#word-holder {
+  text-transform: uppercase;
+}
+
+#search-frame {
+  float: right;
+  width: 400px;
+  height: 100%;
+  border: 0;
+}
+
+</style>
+<h1 id="word-holder"></h1>
+<p>
+  <canvas width="500" height="500"></canvas>
+</p>
+<script src="FileSaver.js"></script>
+<script src="pictures.js"></script>
+<script>
+
+var word = 0;
+var words = Object.keys(pictures);
+words.sort();
+var wordHolder = document.getElementById('word-holder');
+
+var canvas = document.getElementsByTagName('canvas')[0];
+var ctx = canvas.getContext('2d');
+
+function redraw() {
+  var bb = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, bb.width, bb.height);
+  var picture = pictures[words[word]];
+  for (var i = 0; i < picture.length; ++i) {
+    var strip = picture[i];
+    var oox = ox = strip[0].x;
+    var ooy = oy = strip[0].y;
+    for (var j = 1; j < strip.length; ++j) {
+      var p = strip[j];
+      ctx.lineWidth = p.pressure * 0.01;
+      ctx.beginPath();
+      ctx.moveTo(oox, ooy);
+      ctx.lineTo(ox, oy);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      oox = ox; ooy = oy;
+      ox = p.x; oy = p.y;
+    }
+  }
+}
+
+function updateWord() {
+  wordHolder.innerHTML = words[word];
+  redraw();
+}
+
+function nextWord() {
+  word += 1;
+  updateWord();
+}
+
+function prevWord() {
+  word -= 1;
+  updateWord();
+}
+
+window.addEventListener('keyup', function(e) {
+  if (e.keyCode === KeyEvent.DOM_VK_N) {
+    nextWord();
+  } else if (e.keyCode === KeyEvent.DOM_VK_P) {
+    prevWord();
+  }
+});
+
+updateWord();
+
+</script>
+</html>
