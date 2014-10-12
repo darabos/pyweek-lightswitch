@@ -1,6 +1,6 @@
 #!/bin/sh -xue
 
-VERSION=1.1
+VERSION=1.2
 DIST=pyweek-lightswitch-$VERSION
 
 rm -rf $DIST || true
