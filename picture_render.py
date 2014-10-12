@@ -211,7 +211,7 @@ class WordPicture(object):
     l = glGetUniformLocation(prg, b'render_post_time')
     glUniform1f(l, 0.2)
     l = glGetUniformLocation(prg, b'unrender_pre_time')
-    glUniform1f(l, 0.4)
+    glUniform1f(l, 0.8)
     l = glGetUniformLocation(prg, b'main_color')
     glUniform4f(l, *main_color)
     l = glGetUniformLocation(prg, b'tip_color')

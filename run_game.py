@@ -258,7 +258,7 @@ class Game(object):
               if p.accepted:
                 p.Render(t, t - 2.5)
               else:
-                p.Render(t, t - 1.2)
+                p.Render(t, t - 1.4)
             else:
               self.pictures.remove(p)
 
