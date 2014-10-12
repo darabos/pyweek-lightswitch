@@ -258,6 +258,7 @@ class WordPictureLoader(object):
   def __init__(self):
     self.source = zipfile.ZipFile('pictures_vbuf.zip', 'r')
     self.all_words = self.source.namelist()
+    print len(self.all_words), 'pictures loaded.'
 
   def WordPictureForWord(self, word):
     if word not in self.all_words:
