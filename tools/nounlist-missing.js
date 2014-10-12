@@ -38,4 +38,8 @@ var words = [
   'barbarian',
   'guy',
   'anchor',
+  'eskimo',
+  'igloo',
+  'clown',
+  'vampire',
   ];
