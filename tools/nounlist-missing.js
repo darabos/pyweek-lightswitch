@@ -132,4 +132,7 @@ var words = [
 
 // The words above are done.
 words = [
+  'robber',
+  'human',
+  'pistol',
   ];
