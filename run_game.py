@@ -199,10 +199,16 @@ class Game(object):
 
   def Loop(self):
     pygame.init()
-    pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1)
-    pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 4)
     pygame.display.set_caption('Lightswitch')
-    pygame.display.set_mode((WIDTH, HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE)
+    try:
+      pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1)
+      pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 4)
+      pygame.display.set_mode((WIDTH, HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE)
+    except pygame.error:
+      pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0)
+      pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0)
+      pygame.display.set_mode((WIDTH, HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE)
+
     glViewport(0, 0, WIDTH, HEIGHT)
     glMatrixMode(GL_PROJECTION)
     glScale(2.0 / WIDTH, 2.0 / HEIGHT, 1.0)
